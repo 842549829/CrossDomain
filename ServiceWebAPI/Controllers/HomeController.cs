@@ -8,23 +8,54 @@ namespace ServiceWebAPI
 {
     public class HomeController : ApiController
     {
+
+        public Reqesut Decrypt(Reqesut request)
+        {
+            if (request != null)
+            {
+                var authorization = this.Request.Headers.Authorization?.Scheme;
+                var opneid = GetOpnedId();
+                var key = Get(authorization + opneid);
+                if (string.IsNullOrWhiteSpace(authorization) || string.IsNullOrWhiteSpace(key))
+                {
+                    key = "ABCDEFGABCDEFG12ABCDEFGABCDEFG12";
+                }
+                request.Data = Encrypt.DecryptAes(request.Data, key);
+                var newKey = GetNewKey();
+                request.AccessToken = newKey;
+                Insert(newKey + opneid, newKey);
+                return request;
+            }
+            return null;
+        }
+
+        public IHttpActionResult LoginSys(Reqesut request)
+        {
+            // 1.解密
+            Decrypt(request);
+            // 2.反序列化
+            // 3.执行业务
+            // 5.加密返回数据
+            Result<string> ret = new Result<string>
+            {
+                IsSuccess = true,
+                Message = "OK",
+                Authorization = request.AccessToken,
+                Data = "OK"
+            };
+            
+            return Ok(ret);
+        }
+
         public IHttpActionResult ListDataTest(Reqesut request)
         {
-            var authorization = this.Request.Headers.Authorization.Scheme;
-            var opneid =   GetOpnedId();
-            var key = Get(authorization + opneid);
-            if (string.IsNullOrWhiteSpace(key))
-            {
-                key = "ABCDEFGABCDEFG12ABCDEFGABCDEFG12";
-            }
-            var data = Encrypt.DecryptAes(request.Data, key);
-            var value = GetNewKey();
-            Insert(value + opneid, value);
+            Decrypt(request);
+
             Result<string> ret = new Result<string>
             {
                 IsSuccess = true,
                 Message = "清楚参数为空",
-                Authorization = value,
+                Authorization = request.AccessToken,
                 Data = "xxxxx"
             };
             return Ok(ret);
