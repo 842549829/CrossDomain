@@ -4,8 +4,15 @@
     <meta charset="utf-8" />
     <meta http-equiv="Access-Control-Allow-Origin" content="*">
     <title>跨域访问</title>
+    <!--ase加密-->
+    @*<script src="~/Content/js/CryptoJS v3.1.2/components/core-min.js"></script>
+    <script src="~/Content/js/CryptoJS v3.1.2/components/aes-min.js"></script>*@
+    <script src="~/Content/js/crypto/core.js"></script>
+    <script src="~/Content/js/crypto/crypto-js.js"></script>
+    <script src="~/Content/js/crypto/mode-ecb.js"></script>
+    <script src="~/Content/js/crypto/aes.js"></script>
+    <!--jquery-->
     <script src="~/Scripts/jquery-3.2.1.min.js"></script>
-
 </head>
 <body>
     <input type="button" value="跨域获取数据" id="getData" />

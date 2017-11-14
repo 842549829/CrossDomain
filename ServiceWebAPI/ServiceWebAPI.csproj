@@ -96,8 +96,11 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\Ret.cs" />
+    <Compile Include="Models\Encrypt.cs" />
+    <Compile Include="Models\Result.cs" />
+    <Compile Include="Models\Request.cs" />
     <Compile Include="Models\UserInfo.cs" />
+    <Compile Include="Models\Util.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -8,133 +8,58 @@ namespace ServiceWebAPI
 {
     public class HomeController : ApiController
     {
-        /// <summary>
-        /// 获取用户信息集合的方法
-        /// </summary>
-        /// <returns>返回用户信息集合</returns>
-        public IHttpActionResult ListDataTest(Ret ret)
+        public IHttpActionResult ListDataTest(Reqesut request)
         {
-            if (ret.IsSuccess)
+            var authorization = this.Request.Headers.Authorization.Scheme;
+            var opneid =   GetOpnedId();
+            var key = Get(authorization + opneid);
+            if (string.IsNullOrWhiteSpace(key))
             {
-                var token = GetCookie("Token");
-                if (string.IsNullOrWhiteSpace(token))
-                {
-                    WriteCookie("Token", ret.Data, DateTime.Now.AddDays(1));
-                }
+                key = "ABCDEFGABCDEFG12ABCDEFGABCDEFG12";
             }
-            var head = this.Request;
-            var authorization = head.Headers.Authorization;
-          
-            List<UserInfo> list = new List<UserInfo>()
-               {
-                new UserInfo()
-                {
-                 Id = 1,
-                 UserName = "张三",
-                 UserPass = "FDASDFAS",
-                 Email = "zhangsan@163.com",
-                 RegTime = DateTime.Now
-                },
-                new UserInfo()
-                {
-                 Id = 2,
-                 UserName = "李四",
-                 UserPass = "FDASDFAS",
-                 Email = "lisi@163.com",
-                 RegTime = DateTime.Now
-                },
-                new UserInfo()
-                {
-                 Id = 3,
-                 UserName = "王五",
-                 UserPass = "FDASDFAS",
-                 Email = "wangwu@163.com",
-                 RegTime = DateTime.Now
-                },
-                new UserInfo()
-                {
-                 Id = 4,
-                 UserName = "赵六",
-                 UserPass = "FDASDFAS",
-                 Email = "zhaoliu@163.com",
-                 RegTime = DateTime.Now
-                },
-                new UserInfo()
-                {
-                 Id = 5,
-                 UserName = "田七",
-                 UserPass = "FDASDFAS",
-                 Email = "tianqi@163.com",
-                 RegTime = DateTime.Now
-                },
-                new UserInfo()
-                {
-                 Id = 6,
-                 UserName = "王八",
-                 UserPass = "FDASDFAS",
-                 Email = "wangba@163.com",
-                 RegTime = DateTime.Now
-                }
-               };
-            return Ok(list);
-        }
-
-        /// <summary>
-        /// 写Cookie
-        /// </summary>
-        /// <param name="key">key</param>
-        /// <param name="value">value</param>
-        /// <param name="dateTime">有效时间</param>
-        public static void WriteCookie(string key, string value, DateTime dateTime)
-        {
-            string domain = HttpContext.Current.Request.Url.Host;
-            if (!HttpContext.Current.Request.Url.IsLoopback)
+            var data = Encrypt.DecryptAes(request.Data, key);
+            var value = GetNewKey();
+            Insert(value + opneid, value);
+            Result<string> ret = new Result<string>
             {
-                domain = domain.Substring(domain.IndexOf(".", StringComparison.Ordinal) + 1);
-            }
-            HttpCookie systemCookie = HttpContext.Current.Response.Cookies[key];
-            if (systemCookie != null)
-            {
-                HttpContext.Current.Response.Cookies.Remove(key);
-            }
-            systemCookie = new HttpCookie(key, value)
-            {
-                Expires = dateTime,
-
-                Path = "/"
+                IsSuccess = true,
+                Message = "清楚参数为空",
+                Authorization = value,
+                Data = "xxxxx"
             };
-            if (!Regex.IsMatch(domain, @"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$"))
-            {
-                systemCookie.Domain = domain;
-            }
-            HttpContext.Current.Response.Cookies.Add(systemCookie);
+            return Ok(ret);
         }
 
-        /// <summary>
-        /// 根据cookie名称，获取cookie值
-        /// </summary>
-        /// <param name="key">cookie名称</param>
-        /// <returns>Cookie</returns>
-        public static string GetCookie(string key)
+        private void Insert(string key, string value)
         {
-            if (HttpContext.Current == null)
+            HttpRuntime.Cache.Insert(key, value);
+        }
+
+        private string Get(string key)
+        {
+            var value = HttpRuntime.Cache.Get(key);
+            if (value != null)
             {
-                return string.Empty;
+                return value.ToString();
             }
-            if (HttpContext.Current.Request == null)
+            return null;
+        }
+
+        private string GetOpnedId()
+        {
+            var token = Util.GetCookie("Token1");
+            if (string.IsNullOrWhiteSpace(token))
             {
-                return string.Empty;
+                string opnedId = GetNewKey();
+                Util.WriteCookie("Token1", opnedId, DateTime.Now.AddYears(1));
+                return opnedId;
             }
-            if (HttpContext.Current.Request.Cookies == null)
-            {
-                return string.Empty;
-            }
-            HttpCookie cookie = HttpContext.Current.Request.Cookies[key];
-            if (cookie != null)
-            {
-                return cookie.Value;
-            }
-            return string.Empty;
+            return token;
+        }
+
+        private string GetNewKey()
+        {
+            return Guid.NewGuid().ToString().Replace("-", string.Empty).ToUpper();
         }
     }
 }
