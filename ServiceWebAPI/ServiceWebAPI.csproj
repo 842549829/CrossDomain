@@ -93,14 +93,18 @@
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\UnauthorizedController.cs" />
     <Compile Include="Filters\CustomerFilter.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\LoginResult.cs" />
     <Compile Include="Models\Encrypt.cs" />
+    <Compile Include="Models\LoginRequest.cs" />
     <Compile Include="Models\Result.cs" />
     <Compile Include="Models\Request.cs" />
     <Compile Include="Models\UserInfo.cs" />
+    <Compile Include="Models\UserManager.cs" />
     <Compile Include="Models\Util.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

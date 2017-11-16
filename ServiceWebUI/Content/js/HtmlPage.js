@@ -61,15 +61,19 @@
 $(function () {
     // 默认密钥
     var defaultKey = "ABCDEFGABCDEFG12ABCDEFGABCDEFG12";
-
+    var newKey = "";
     $("#btnLogin").click(function () {
-        var contnt = window.aseEncrypt(JSON.stringify({ Login: "admin", Pwd: "888888" }), defaultKey);
+        var parameters = {
+            UserName: "admin",
+            Pwd: "888888"
+        };
+        var contnt = window.aseEncrypt(JSON.stringify(parameters), defaultKey);
         $.ajax({
             data: {
                 Data: contnt
             },
             type: "POST",
-            url: 'http://localhost:18030/api/home/LoginSys',
+            url: 'http://localhost:18030/api/Unauthorized/Login',
             //headers: {
             //    // 授权字段
             //    Authorization: key
@@ -83,7 +87,10 @@ $(function () {
                 //以表格的形式在浏览器控制台显示数据,IE下不支持
                 console.table(data);
                 if (data.IsSuccess) {
-                    defaultKey = data.Authorization;
+                    var decryptStr = window.aseDecrypt(data.Data, defaultKey);
+                    var decryptData = JSON.parse(decryptStr);
+                    defaultKey = decryptData.AccessToken
+                    newKey = decryptData.Encryptionkey;
                     alert("登录成功");
                 }
             },
@@ -95,17 +102,22 @@ $(function () {
 
     $('#getData').click(function () {
         var key = defaultKey;
-        var contnt = window.aseEncrypt(JSON.stringify({ Key: "xaadd", Name: "王道" }), key);
+        var parameters = {
+            Key: "xaadd",
+            Name: "王道"
+        };
+        var contnt = window.aseEncrypt(JSON.stringify(parameters), newKey);
         $.ajax({
             data: {
+                AccessToken: defaultKey,
                 Data: contnt
             },
             type: "POST",
             url: 'http://localhost:18030/api/home/ListDataTest',
-            headers: {
-                // 授权字段
-                Authorization: key
-            },
+            //headers: {
+            //    // 授权字段
+            //    Authorization: key
+            //},
             crossDomain: true,
             xhrFields: {
                 //启用cookie
@@ -115,7 +127,11 @@ $(function () {
                 //以表格的形式在浏览器控制台显示数据,IE下不支持
                 console.table(data);
                 if (data.IsSuccess) {
-                    defaultKey = data.Authorization;
+                    var decryptStr = window.aseDecrypt(data.Data, newKey);
+                    var decryptData = JSON.parse(decryptStr);
+                    defaultKey = decryptData.AccessToken
+                    newKey = decryptData.Encryptionkey;
+                    alert("测试授权成功");
                 }
             },
             error: function (e) {

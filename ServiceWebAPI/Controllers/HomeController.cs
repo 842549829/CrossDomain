@@ -6,6 +6,7 @@ using System.Web.Http;
 
 namespace ServiceWebAPI
 {
+    [CustomerFilter]
     public class HomeController : ApiController
     {
 
@@ -40,25 +41,33 @@ namespace ServiceWebAPI
             {
                 IsSuccess = true,
                 Message = "OK",
-                Authorization = request.AccessToken,
                 Data = "OK"
             };
-            
+
             return Ok(ret);
         }
 
-        public IHttpActionResult ListDataTest(Reqesut request)
+        [HttpPost]
+        public IHttpActionResult ListDataTest([FromBody]Reqesut request)
         {
-            Decrypt(request);
-
-            Result<string> ret = new Result<string>
+            Result<string> res = new Result<string>();
+            try
             {
-                IsSuccess = true,
-                Message = "清楚参数为空",
-                Authorization = request.AccessToken,
-                Data = "xxxxx"
-            };
-            return Ok(ret);
+                var requestmodel = request.Data.DeserializeObject<object>();
+                var data = new { T = "12",
+                    KK = "xx",
+                    AccessToken = request.AccessToken,
+                    Encryptionkey = UserManager.LoginTokenDataList[request.AccessToken].Encryptionkey
+                };
+                res.IsSuccess = true;
+                res.Data = data.ToJson(request.AccessToken);
+            }
+            catch (Exception ex)
+            {
+                res.IsSuccess = false;
+                res.Message = ex.Message;
+            }
+            return Ok(res);
         }
 
         private void Insert(string key, string value)

@@ -14,17 +14,12 @@ namespace ServiceWebAPI
         /// 源IP
         /// </summary>
         /// <value>The opera system.</value>
-        public string Srcip { get; set; }
+        public string NewAccessToken { get; set; }
 
         /// <summary>
         /// 时间戳
         /// </summary>
         public DateTime Timestamp { get; set; }
-
-        /// <summary>
-        /// 时间戳指纹，有默认盐值
-        /// </summary>
-        public string Md5 { get; set; }
 
         /// <summary>
         /// 数据
