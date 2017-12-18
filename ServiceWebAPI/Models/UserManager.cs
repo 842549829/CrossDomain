@@ -18,6 +18,7 @@ namespace ServiceWebAPI
         /// <param name="retmodel">The retmodel.</param>
         public static void AddTokenToTokenCache(LoginResult retmodel)
         {
+            // 该地方可以考虑存入到 redis 设置有效期为30分钟
             if (!LoginTokenDataList.ContainsKey(retmodel.AccessToken))
             {
                 LoginTokenDataList.Add(retmodel.AccessToken, retmodel);

@@ -12,7 +12,7 @@ namespace ServiceWebAPI
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
             Reqesut request = (Reqesut)actionContext.ActionArguments["request"];
-            var retModel = CheckToken(request, actionContext);
+            var retModel = CheckToken(request);
             if (retModel.IsSuccess)
             {
                 request.Data = Encrypt.DecryptAes(request.Data, UserManager.LoginTokenDataList[request.AccessToken].Encryptionkey);
@@ -24,7 +24,7 @@ namespace ServiceWebAPI
             }
         }
 
-        public Result CheckToken(Reqesut requestModel, HttpActionContext actionContext)
+        private Result CheckToken(Reqesut requestModel)
         {
             Result result = new Result();
             if (requestModel == null || string.IsNullOrWhiteSpace(requestModel.Data))
@@ -45,17 +45,6 @@ namespace ServiceWebAPI
                 result.Message = "密钥已过期";
                 return result;
             }
-
-            //var loginResult = UserManager.LoginTokenDataList[requestModel.AccessToken];
-            //var newLoginResult = new LoginResult
-            //{
-            //    AccessToken = Encrypt.GetNewKey(),
-            //    Encryptionkey = Encrypt.GetNewKey(),
-            //    TokenExpiration = DateTime.Now.AddYears(100),
-            //    UserInfo = loginResult.UserInfo,
-            //};
-            //UserManager.AddTokenToTokenCache(newLoginResult);
-            //result.Message = newLoginResult.AccessToken;
             result.IsSuccess = true;
             return result;
         }
