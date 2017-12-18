@@ -53,21 +53,7 @@ namespace ServiceWebAPI
             Result<string> res = new Result<string>();
             try
             {
-                var oldLoginResult = UserManager.LoginTokenDataList[request.AccessToken];
-                var loginResult = new LoginResult
-                {
-                    AccessToken = Encrypt.GetNewKey(),
-                    Encryptionkey = Encrypt.GetNewKey(),
-                    TokenExpiration = DateTime.Now.AddYears(100),
-                    UserInfo = new UserInfo
-                    {
-                        Email = oldLoginResult.UserInfo.Email,
-                        Id = oldLoginResult.UserInfo.Id,
-                        RegTime = oldLoginResult.UserInfo.RegTime,
-                        UserName = oldLoginResult.UserInfo.UserName,
-                    }
-                };
-                UserManager.AddTokenToTokenCache(loginResult);
+                LoginResult loginResult = GetNewKey(request);
                 var requestmodel = request.Data.DeserializeObject<object>();
                 var data = new
                 {
@@ -85,6 +71,26 @@ namespace ServiceWebAPI
                 res.Message = ex.Message;
             }
             return Ok(res);
+        }
+
+        private static LoginResult GetNewKey(Reqesut request)
+        {
+            var oldLoginResult = UserManager.LoginTokenDataList[request.AccessToken];
+            var loginResult = new LoginResult
+            {
+                AccessToken = Encrypt.GetNewKey(),
+                Encryptionkey = Encrypt.GetNewKey(),
+                TokenExpiration = DateTime.Now.AddYears(100),
+                UserInfo = new UserInfo
+                {
+                    Email = oldLoginResult.UserInfo.Email,
+                    Id = oldLoginResult.UserInfo.Id,
+                    RegTime = oldLoginResult.UserInfo.RegTime,
+                    UserName = oldLoginResult.UserInfo.UserName,
+                }
+            };
+            UserManager.AddTokenToTokenCache(loginResult);
+            return loginResult;
         }
 
         private void Insert(string key, string value)
