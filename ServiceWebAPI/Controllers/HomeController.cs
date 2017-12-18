@@ -53,11 +53,28 @@ namespace ServiceWebAPI
             Result<string> res = new Result<string>();
             try
             {
+                var oldLoginResult = UserManager.LoginTokenDataList[request.AccessToken];
+                var loginResult = new LoginResult
+                {
+                    AccessToken = Encrypt.GetNewKey(),
+                    Encryptionkey = Encrypt.GetNewKey(),
+                    TokenExpiration = DateTime.Now.AddYears(100),
+                    UserInfo = new UserInfo
+                    {
+                        Email = oldLoginResult.UserInfo.Email,
+                        Id = oldLoginResult.UserInfo.Id,
+                        RegTime = oldLoginResult.UserInfo.RegTime,
+                        UserName = oldLoginResult.UserInfo.UserName,
+                    }
+                };
+                UserManager.AddTokenToTokenCache(loginResult);
                 var requestmodel = request.Data.DeserializeObject<object>();
-                var data = new { T = "12",
+                var data = new
+                {
+                    T = "12",
                     KK = "xx",
-                    AccessToken = request.AccessToken,
-                    Encryptionkey = UserManager.LoginTokenDataList[request.AccessToken].Encryptionkey
+                    AccessToken = loginResult.AccessToken,
+                    Encryptionkey = loginResult.Encryptionkey
                 };
                 res.IsSuccess = true;
                 res.Data = data.ToJson(request.AccessToken);

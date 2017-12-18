@@ -11,12 +11,12 @@ namespace ServiceWebAPI
     {
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
-            Reqesut reqesut = (Reqesut)actionContext.ActionArguments["request"];
-            var retModel = CheckToken(reqesut, actionContext);
+            Reqesut request = (Reqesut)actionContext.ActionArguments["request"];
+            var retModel = CheckToken(request, actionContext);
             if (retModel.IsSuccess)
             {
-                reqesut.Data = Encrypt.DecryptAes(reqesut.Data, UserManager.LoginTokenDataList[reqesut.AccessToken].Encryptionkey);
-                reqesut.NewAccessToken = retModel.Message;
+                request.Data = Encrypt.DecryptAes(request.Data, UserManager.LoginTokenDataList[request.AccessToken].Encryptionkey);
+                request.NewAccessToken = retModel.Message;
             }
             else
             {
