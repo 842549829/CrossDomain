@@ -15,6 +15,9 @@ namespace ServiceWebAPI.Controllers
         [HttpPost]
         public IHttpActionResult Login([FromBody]Reqesut request)
         {
+            var a = this.Request.Headers;
+            var b = this.RequestContext;
+            var h = System.Web.HttpContext.Current.Request.Headers;
             var reqStr = Encrypt.DecryptAes(request.Data, Encrypt.DefaultKey);
             if (string.IsNullOrWhiteSpace(reqStr))
             {

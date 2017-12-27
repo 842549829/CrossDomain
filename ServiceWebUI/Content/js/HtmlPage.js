@@ -74,10 +74,11 @@ $(function () {
             },
             type: "POST",
             url: 'http://localhost:18030/api/Unauthorized/Login',
-            //headers: {
-            //    // 授权字段
-            //    Authorization: key
-            //},
+            headers: {
+                // 授权字段
+                Authorization: "xxxaweddddddddddddddddddddd",
+                //SerA: "xxxaweddddddddddddddddddddd"
+            },
             crossDomain: true,
             xhrFields: {
                 //启用cookie
